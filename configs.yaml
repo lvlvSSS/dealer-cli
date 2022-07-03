@@ -1,0 +1,12 @@
+mode: 'info'
+log: 'D:\Coding\go\projects\dealer-cli\Logs\dealer-cli.log'
+## check: true
+file:
+  extract:
+    xml: true
+    target: '<\?xml version="1.0" encoding="UTF-8" standalone="yes"\?>\s*<ROOT>[\s\S]+<OPTYPE>501</OPTYPE>[\s\S]+</ROOT>'
+    headline: '^\[[\S\s]+\]\s\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2},\d{3}\s\[\S+?\]\s[A-Z]+\s[\s\S]+'
+    file-format: '#{./ROOT/User/User_Name} - #{./ROOT/User/User_Age}.log'
+    location: 'D:\Coding\go\projects\dealer-cli\test\outputs'
+    file-source-dir: 'D:\Coding\go\projects\dealer-cli\test\origin'
+    goroutines: 2

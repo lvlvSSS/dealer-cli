@@ -37,9 +37,16 @@ func main() {
 		ExitErrHandler: func(c *cli.Context, err error) {
 			fmt.Printf("ERROR: Command[%s] - error[%s] \n", c.Command.Name, err.Error())
 		},
-		Flags:  append(appFlags, docs.LoadFlag),
-		Before: altsrc.InitInputSourceWithContext(appFlags, altsrc.NewYamlSourceFromFlagFunc(docs.APP_LOAD_YAML)),
-
+		Flags: append(appFlags, docs.LoadFlag),
+		Before: func(c *cli.Context) error {
+			// if the 'load-yaml' is not specified, then use the default value.
+			// Must Set the 'load-yaml', otherwise the 'load-yaml' can't affect.
+			if !c.IsSet(docs.APP_LOAD_YAML) {
+				c.Set(docs.APP_LOAD_YAML, docs.LoadFlag.Value)
+			}
+			var before = altsrc.InitInputSourceWithContext(appFlags, altsrc.NewYamlSourceFromFlagFunc(docs.APP_LOAD_YAML))
+			return before(c)
+		},
 		Commands: []*cli.Command{
 			schedule.RemoteCommand,
 			dealer_file.FileCommand,

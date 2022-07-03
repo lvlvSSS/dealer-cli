@@ -46,18 +46,22 @@ var ExtractCommand = &cli.Command{
 	Usage: "Extract some specified message from a file and put it in another file",
 	Flags: extractFlags,
 	Action: func(c *cli.Context) error {
-		LOG.InitLog(c)
+		if err := LOG.InitLog(c); err != nil {
+			log.Warn(fmt.Sprintf("dealer_cli extract log init errors[%s]", err))
+			return err
+		}
 		if c.Bool("check") {
 			checkFlag(c)
 			return nil
 		}
+		log.Info("load-yaml : " + c.String(docs.APP_LOAD_YAML))
 		var fileSourceDir = ""
 		if fileSourceDir = c.String("file-source-dir"); len(strings.TrimSpace(fileSourceDir)) != 0 {
 			log.Debug(fmt.Sprintf("dealer_cli extract file-source-dir[%s]", fileSourceDir))
 		} else if fileSourceDir = c.String("file.extract.file-source-dir"); len(strings.TrimSpace(fileSourceDir)) != 0 {
 			log.Debug(fmt.Sprintf("dealer_cli extract file.extract.file-source-dir[%s]", fileSourceDir))
 		} else {
-			return errors.New("file.extract.file-source-dir is empty")
+			return errors.New("dealer_cli extract file-source-dir is empty")
 		}
 		files, err := getAllSubFiles(fileSourceDir)
 		if err != nil {
@@ -97,6 +101,12 @@ var ExtractCommand = &cli.Command{
 }
 
 func getAllSubFiles(parent string) ([]string, error) {
+	parentAbs, err := filepath.Abs(parent)
+	if err != nil {
+		return nil, err
+	}
+	parent = parentAbs
+
 	result := make([]string, 0, 16)
 	stat, err := os.Stat(parent)
 	if err != nil || !stat.IsDir() {
@@ -106,6 +116,9 @@ func getAllSubFiles(parent string) ([]string, error) {
 		return nil, errors.New(fmt.Sprintf("extract file[%s] fails, because it is not directory ", parent))
 	}
 	files, err := os.ReadDir(parent)
+	if err != nil {
+		return nil, err
+	}
 	for _, file := range files {
 		if file.IsDir() {
 			subParent := filepath.Join(parent, file.Name())

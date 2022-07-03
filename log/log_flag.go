@@ -24,16 +24,21 @@ var location, _ = os.Getwd()
 var LogPathFlag = altsrc.NewStringFlag(&cli.StringFlag{
 	Name:  "log",
 	Usage: "specify the log file path",
-	Value: filepath.Join(location, "dealer-cli.log"),
+	Value: filepath.Join(location, "Logs/dealer-cli.log"),
 })
 
-func InitLog(c *cli.Context) {
+func InitLog(c *cli.Context) error {
 	mode := c.String("mode")
-	output := c.String("log")
+	logPath := c.String("log")
 	level := zap.InfoLevel
 	if strings.Compare(strings.ToLower(mode), "debug") == 0 ||
 		strings.Compare(strings.ToLower(mode), "dev") == 0 {
 		level = zap.DebugLevel
 	}
-	log.Init(output, level)
+	logPath, err := filepath.Abs(logPath)
+	if err != nil {
+		return err
+	}
+	log.Init(logPath, level)
+	return nil
 }

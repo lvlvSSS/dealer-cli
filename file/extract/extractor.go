@@ -69,6 +69,11 @@ func New(target string,
 	if len(strings.TrimSpace(fileSourcePath)) == 0 {
 		return nil, errors.New("[dealer_cli.file.extract.New] fileSourcePath is empty")
 	}
+	fileSourcePathAbs, err := filepath.Abs(fileSourcePath)
+	if err != nil {
+		return nil, err
+	}
+	fileSourcePath = fileSourcePathAbs
 	sourceFile, err := os.OpenFile(fileSourcePath, os.O_RDONLY, os.ModeAppend)
 	if err != nil {
 		return nil, errors.Wrap(err,
@@ -83,6 +88,11 @@ func New(target string,
 	if len(strings.TrimSpace(location)) == 0 {
 		return nil, errors.New("[dealer_cli.file.extract.New] location is empty")
 	}
+	locationAbs, err := filepath.Abs(location)
+	if err != nil {
+		return nil, err
+	}
+	location = locationAbs
 	locStat, err := os.Stat(location)
 	if err != nil && !os.IsNotExist(err) {
 		return nil, errors.New(
@@ -111,6 +121,11 @@ func (extractor *GeneralFileExtractor) Init(c *cli.Context) error {
 	if len(strings.TrimSpace(extractor.FileSourcePath)) == 0 {
 		return fmt.Errorf(fmt.Sprintf("[dealer_cli.file.extract.GeneralFileExtractor.split] file source not init "))
 	}
+	fileSourcePathAbs, err := filepath.Abs(extractor.FileSourcePath)
+	if err != nil {
+		return err
+	}
+	extractor.FileSourcePath = fileSourcePathAbs
 	sourceFile, err := os.OpenFile(extractor.FileSourcePath, os.O_RDONLY, os.ModeAppend)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -160,6 +175,11 @@ func (extractor *GeneralFileExtractor) Init(c *cli.Context) error {
 	} else {
 		return fmt.Errorf("[dealer_cli.file.extract.GeneralFileExtractor.Init] init failed : location[%s]", extractor.Location)
 	}
+	locationAbs, err := filepath.Abs(extractor.Location)
+	if err != nil {
+		return err
+	}
+	extractor.Location = locationAbs
 	locStat, err := os.Stat(extractor.Location)
 	if err != nil && !os.IsNotExist(err) {
 		return errors.New(fmt.Sprintf("[dealer_cli.file.extract.GeneralFileExtractor.Init] init failed : location[%s] is not directory", extractor.Location))

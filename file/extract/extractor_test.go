@@ -53,6 +53,18 @@ re:
 
 }
 
+func TestFilePathAbs(t *testing.T) {
+	root, _ := os.Getwd()
+	rootAbs, _ := filepath.Abs(root)
+	if root != rootAbs {
+		t.Fail()
+	}
+	t.Logf("root : %s \n", rootAbs)
+
+	abs, _ := filepath.Abs(".\\extractor_test.go")
+	t.Logf("root : %s \n", abs)
+}
+
 func TestGetAllSubFiles(t *testing.T) {
 	current, _ := os.Getwd()
 	t.Logf("current path : %s \n", current)

@@ -46,12 +46,13 @@ func InitLog(c *cli.Context) error {
 		log.Debug(fmt.Sprintf("[dealer_cli.log.InitLog] - mode forced to [%s]", mode))
 	}
 	var logPath = ""
-	if logPath = c.String("log"); len(strings.TrimSpace(logPath)) != 0 {
+	if LogPathFlag.IsSet() {
 		log.Debug(fmt.Sprintf("[dealer_cli.log.InitLog] - log[%s]", logPath))
+		logPath = c.String("log")
 	} else if logPath = c.String("dealer.log"); len(strings.TrimSpace(logPath)) != 0 {
 		log.Debug(fmt.Sprintf("[dealer_cli.log.InitLog] - dealer.log[%s]", logPath))
 	} else {
-		logPath = log.DefaultLogName
+		logPath = c.String("log")
 		log.Debug(fmt.Sprintf("[dealer_cli.log.InitLog] - log forced to [%s]", logPath))
 	}
 

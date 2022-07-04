@@ -47,7 +47,7 @@ var ExtractCommand = &cli.Command{
 	Flags: extractFlags,
 	Action: func(c *cli.Context) error {
 		if err := LOG.InitLog(c); err != nil {
-			log.Warn(fmt.Sprintf("dealer_cli extract log init errors[%s]", err))
+			log.Warn(fmt.Sprintf("dealer_cli extract - log init errors[%s]", err))
 			return err
 		}
 		if c.Bool("check") || c.Bool("dealer.check") {
@@ -56,11 +56,11 @@ var ExtractCommand = &cli.Command{
 		}
 		var fileSourceDir = ""
 		if fileSourceDir = c.String("file-source-dir"); len(strings.TrimSpace(fileSourceDir)) != 0 {
-			log.Debug(fmt.Sprintf("dealer_cli extract file-source-dir[%s]", fileSourceDir))
+			log.Debug(fmt.Sprintf("dealer_cli extract - file-source-dir[%s]", fileSourceDir))
 		} else if fileSourceDir = c.String("dealer.file.extract.file-source-dir"); len(strings.TrimSpace(fileSourceDir)) != 0 {
-			log.Debug(fmt.Sprintf("dealer_cli extract file.extract.file-source-dir[%s]", fileSourceDir))
+			log.Debug(fmt.Sprintf("dealer_cli extract - file.extract.file-source-dir[%s]", fileSourceDir))
 		} else {
-			return errors.New("dealer_cli extract file-source-dir is empty")
+			return errors.New("dealer_cli extract - file-source-dir is empty")
 		}
 		files, err := getAllSubFiles(fileSourceDir)
 		if err != nil {
@@ -76,15 +76,15 @@ var ExtractCommand = &cli.Command{
 			go func(group *sync.WaitGroup) {
 				defer group.Done()
 				if err := fileExtractor.Init(c); err != nil {
-					log.Info(fmt.Sprintf("dealer-cli file[%s] extractor Init errors : %s", fileExtractor.FileSourcePath, err))
+					log.Info(fmt.Sprintf("dealer-cli file[%s] extractor - Init errors : %s", fileExtractor.FileSourcePath, err))
 					return
 				}
 				if err := fileExtractor.Extract(); err != nil {
-					log.Info(fmt.Sprintf("dealer-cli file[%s] extractor Extract errors : %s", fileExtractor.FileSourcePath, err))
+					log.Info(fmt.Sprintf("dealer-cli file[%s] extractor - Extract errors : %s", fileExtractor.FileSourcePath, err))
 					return
 				}
 				if err := fileExtractor.Done(); err != nil {
-					log.Info(fmt.Sprintf("dealer-cli file[%s] extractor Extract Done : %s", fileExtractor.FileSourcePath, err))
+					log.Info(fmt.Sprintf("dealer-cli file[%s] extractor - Extract Done : %s", fileExtractor.FileSourcePath, err))
 					return
 				}
 			}(wg)

@@ -13,6 +13,10 @@ var scheduleFlags = []cli.Flag{
 	cronYamlFlag,
 	repeatFlag,
 	repeatYamlFlag,
+	timesFlag,
+	timesYamlFlag,
+	durationFlag,
+	durationYamlFlag,
 }
 
 var ScheduleCommand = &cli.Command{

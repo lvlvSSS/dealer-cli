@@ -68,7 +68,7 @@ func TestFormat(t *testing.T) {
 
 func TestRoot(t *testing.T) {
 	root, _ := os.Getwd()
-	fmt.Println(filepath.Join(root, "./headline.benchmark"))
+	fmt.Println(filepath.Join(root, "./file.extract.headline.dealer"))
 	info, err := os.Stat("./somedemo_test.go")
 	if err != nil {
 		fmt.Println(err.Error())

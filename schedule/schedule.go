@@ -2,6 +2,6 @@ package schedule
 
 import "sync"
 
-type Remote interface {
+type Schedule interface {
 	Handle(wg *sync.WaitGroup) error
 }

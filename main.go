@@ -58,7 +58,7 @@ func main() {
 			return before(c)
 		},
 		Commands: []*cli.Command{
-			schedule.RemoteCommand,
+			schedule.ScheduleCommand,
 			dealer_file.FileCommand,
 		},
 		EnableBashCompletion: true,

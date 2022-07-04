@@ -22,11 +22,11 @@ func ExampleInfo() {
 	log.Init(log.DefaultLogName, zap.DebugLevel, zap.AddStacktrace(stackTrace{}), zap.AddCaller(), zap.Development())
 	log.Debug("This is a testing ...")
 	// Output:
-	// 2022-06-16 00:09:50.965 |debug |benchmark-cli |D:/Coding/go/projects/benchmark-cli/utils/log/logger.go:108 |This is a testing ...
-	// benchmark-cli/utils/log.Debug
-	// D:/Coding/go/projects/benchmark-cli/utils/log/logger.go:108
-	// benchmark-cli/test.ExampleInfo
-	// D:/Coding/go/projects/benchmark-cli/test/example_test.go:24
+	// 2022-06-16 00:09:50.965 |debug |dealer-cli |D:/Coding/go/projects/dealer-cli/utils/log/logger.go:108 |This is a testing ...
+	// dealer-cli/utils/log.Debug
+	// D:/Coding/go/projects/dealer-cli/utils/log/logger.go:108
+	// dealer-cli/test.ExampleInfo
+	// D:/Coding/go/projects/dealer-cli/test/example_test.go:24
 	// testing.runExample
 	// D:/Coding/go/go/src/testing/run_example.go:63
 	// testing.runExamples

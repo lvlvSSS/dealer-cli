@@ -74,7 +74,7 @@ var goroutinesYamlFlag = altsrc.NewIntFlag(&cli.IntFlag{
 var fileSourceDirFlag = &cli.StringFlag{
 	Name:     "file-source-dir",
 	Usage:    "Specifies the directory of the files source",
-	FilePath: filepath.Join(location, "./file.source.dir.benchmark"),
+	FilePath: filepath.Join(location, "./file.source.dir.dealer"),
 }
 
 var fileSourceDirYamlFlag = altsrc.NewStringFlag(&cli.StringFlag{

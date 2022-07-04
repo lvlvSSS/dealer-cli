@@ -150,7 +150,7 @@ func (extractor *GeneralFileExtractor) Init(c *cli.Context) error {
 	var headlineStr = ""
 	if headlineStr = c.String("headline"); len(strings.TrimSpace(headlineStr)) != 0 {
 		log.Debug(fmt.Sprintf("[dealer_cli.file.extract.GeneralFileExtractor.Init] - headline[%s]", headlineStr))
-	} else if headlineStr = c.String("file.extract.headline"); len(strings.TrimSpace(headlineStr)) != 0 {
+	} else if headlineStr = c.String("dealer.file.extract.headline"); len(strings.TrimSpace(headlineStr)) != 0 {
 		log.Debug(fmt.Sprintf("[dealer_cli.file.extract.GeneralFileExtractor.Init] - file.extract.headline[%s]", headlineStr))
 	} else {
 		return fmt.Errorf("[dealer_cli.file.extract.GeneralFileExtractor.Init] init failed : headline[%s]", headlineStr)
@@ -162,15 +162,19 @@ func (extractor *GeneralFileExtractor) Init(c *cli.Context) error {
 	extractor.Headline = headlineCompile
 
 	// set goroutine number
-	if extractor.goroutines = c.Int("goroutines"); extractor.goroutines < 1 {
-		log.Warn("[dealer_cli.file.extract.GeneralFileExtractor.Init] goroutines number forced to 1 ")
+	if extractor.goroutines = c.Int("goroutines"); extractor.goroutines > 0 {
+		log.Debug(fmt.Sprintf("[dealer_cli.file.extract.GeneralFileExtractor.Init] goroutines is %d ", extractor.goroutines))
+	} else if extractor.goroutines = c.Int("goroutines"); extractor.goroutines > 0 {
+		log.Debug(fmt.Sprintf("[dealer_cli.file.extract.GeneralFileExtractor.Init] goroutines is %d ", extractor.goroutines))
+	} else {
+		log.Debug("[dealer_cli.file.extract.GeneralFileExtractor.Init] goroutines number forced to 1 ")
 		extractor.goroutines = 1
 	}
 
 	// set location
 	if extractor.Location = c.String("location"); strings.TrimSpace(extractor.Location) != "" {
 		log.Debug(fmt.Sprintf("[dealer_cli.file.extract.GeneralFileExtractor.Init] - location[%s]", extractor.Location))
-	} else if extractor.Location = c.String("file.extract.location"); strings.TrimSpace(extractor.Location) != "" {
+	} else if extractor.Location = c.String("dealer.file.extract.location"); strings.TrimSpace(extractor.Location) != "" {
 		log.Debug(fmt.Sprintf("[dealer_cli.file.extract.GeneralFileExtractor.Init] - file.extract.location[%s]", extractor.Location))
 	} else {
 		return fmt.Errorf("[dealer_cli.file.extract.GeneralFileExtractor.Init] init failed : location[%s]", extractor.Location)
@@ -192,7 +196,7 @@ func (extractor *GeneralFileExtractor) Init(c *cli.Context) error {
 	// set file target format
 	if extractor.FileTargetFormat = c.String("file-format"); len(strings.TrimSpace(extractor.FileTargetFormat)) != 0 {
 		log.Debug(fmt.Sprintf("[dealer_cli.file.extract.GeneralFileExtractor.Init] - file-format[%s]", extractor.FileTargetFormat))
-	} else if extractor.FileTargetFormat = c.String("file.extract.file-format"); len(strings.TrimSpace(extractor.FileTargetFormat)) != 0 {
+	} else if extractor.FileTargetFormat = c.String("dealer.file.extract.file-format"); len(strings.TrimSpace(extractor.FileTargetFormat)) != 0 {
 		log.Debug(fmt.Sprintf("[dealer_cli.file.extract.GeneralFileExtractor.Init] - file.extract.file-format[%s]", extractor.FileTargetFormat))
 	} else {
 		return fmt.Errorf("[dealer_cli.file.extract.GeneralFileExtractor.Init] init failed : file-format[%s]", extractor.FileTargetFormat)

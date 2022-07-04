@@ -14,7 +14,7 @@ var headlineFlag = &cli.StringFlag{
 	FilePath: filepath.Join(location, "./file.extract.headline.dealer"),
 }
 var headlineYamlFlag = altsrc.NewStringFlag(&cli.StringFlag{
-	Name:  "file.extract.headline",
+	Name:  "dealer.file.extract.headline",
 	Usage: "Specify the head of each message, same as the flag 'headline'",
 })
 
@@ -24,7 +24,7 @@ var targetFlag = &cli.StringFlag{
 	FilePath: filepath.Join(location, "./file.extract.target.dealer"),
 }
 var targetYamlFlag = altsrc.NewStringFlag(&cli.StringFlag{
-	Name:  "file.extract.target",
+	Name:  "dealer.file.extract.target",
 	Usage: "Specifies the target content to extract, same as the flag 'target'",
 })
 
@@ -34,7 +34,7 @@ var fileFormatFlag = &cli.StringFlag{
 	FilePath: filepath.Join(location, "./file.extract.file-format.dealer"),
 }
 var fileFormatYamlFlag = altsrc.NewStringFlag(&cli.StringFlag{
-	Name:  "file.extract.file-format",
+	Name:  "dealer.file.extract.file-format",
 	Usage: "Specifies the format of the file generated after extraction, same as the flag 'file-format' ",
 })
 
@@ -44,7 +44,7 @@ var fileLocationFlag = &cli.StringFlag{
 	FilePath: filepath.Join(location, "./file.extract.location.dealer"),
 }
 var fileLocationYamlFlag = altsrc.NewStringFlag(&cli.StringFlag{
-	Name:  "file.extract.location",
+	Name:  "dealer.file.extract.location",
 	Usage: "Specifies the location of the file generated after extraction, same as the flag 'location' ",
 })
 
@@ -55,7 +55,7 @@ var xmlFlag = &cli.BoolFlag{
 }
 
 var xmlYamlFlag = altsrc.NewBoolFlag(&cli.BoolFlag{
-	Name:  "file.extract.xml",
+	Name:  "dealer.file.extract.xml",
 	Usage: "Specifies that the string of source is xml, same as the flag 'xml' ",
 	Value: false,
 })
@@ -67,7 +67,7 @@ var goroutinesFlag = &cli.IntFlag{
 }
 
 var goroutinesYamlFlag = altsrc.NewIntFlag(&cli.IntFlag{
-	Name:  "file.extract.goroutines",
+	Name:  "dealer.file.extract.goroutines",
 	Usage: "the max of goroutines numbers to analysis one file, same as the flag 'goroutines'",
 })
 
@@ -78,6 +78,6 @@ var fileSourceDirFlag = &cli.StringFlag{
 }
 
 var fileSourceDirYamlFlag = altsrc.NewStringFlag(&cli.StringFlag{
-	Name:  "file.extract.file-source-dir",
+	Name:  "dealer.file.extract.file-source-dir",
 	Usage: "Specifies the directory of the files source, same as the flag 'file-source-dir' ",
 })

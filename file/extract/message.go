@@ -34,13 +34,13 @@ type LogXmlMessage struct {
 // Init - suggest to use Init to create LogXmlMessage object.
 func (message *LogXmlMessage) Init(c *cli.Context) error {
 	// xml flag - is not set, then can't use the LogXmlMessage to handle.
-	if !c.Bool("xml") && !c.Bool("file.extract.xml") {
+	if !c.Bool("xml") && !c.Bool("dealer.file.extract.xml") {
 		return fmt.Errorf("[dealer_cli.file.extract.LogXmlMessage.Init] target file is not xml ")
 	}
 
 	if message.Target = c.String("target"); len(strings.TrimSpace(message.Target)) != 0 {
 		log.Debug(fmt.Sprintf("[dealer_cli.file.extract.LogXmlMessage.Init] - target[%s]", message.Target))
-	} else if message.Target = c.String("file.extract.target"); len(strings.TrimSpace(message.Target)) != 0 {
+	} else if message.Target = c.String("dealer.file.extract.target"); len(strings.TrimSpace(message.Target)) != 0 {
 		log.Debug(fmt.Sprintf("[dealer_cli.file.extract.LogXmlMessage.Init] - file.extract.target[%s]", message.Target))
 	} else {
 		return fmt.Errorf("[dealer_cli.file.extract.LogXmlMessage.Init] init failed : targetFormat[%s]", message.Target)

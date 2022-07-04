@@ -50,15 +50,14 @@ var ExtractCommand = &cli.Command{
 			log.Warn(fmt.Sprintf("dealer_cli extract log init errors[%s]", err))
 			return err
 		}
-		if c.Bool("check") {
+		if c.Bool("check") || c.Bool("dealer.check") {
 			checkFlag(c)
 			return nil
 		}
-		log.Info("load-yaml : " + c.String(docs.APP_LOAD_YAML))
 		var fileSourceDir = ""
 		if fileSourceDir = c.String("file-source-dir"); len(strings.TrimSpace(fileSourceDir)) != 0 {
 			log.Debug(fmt.Sprintf("dealer_cli extract file-source-dir[%s]", fileSourceDir))
-		} else if fileSourceDir = c.String("file.extract.file-source-dir"); len(strings.TrimSpace(fileSourceDir)) != 0 {
+		} else if fileSourceDir = c.String("dealer.file.extract.file-source-dir"); len(strings.TrimSpace(fileSourceDir)) != 0 {
 			log.Debug(fmt.Sprintf("dealer_cli extract file.extract.file-source-dir[%s]", fileSourceDir))
 		} else {
 			return errors.New("dealer_cli extract file-source-dir is empty")
@@ -137,15 +136,39 @@ func getAllSubFiles(parent string) ([]string, error) {
 
 func checkFlag(c *cli.Context) {
 	log.Warn("dealer-cli file extract - check flags begins ...")
-	getwd, _ := os.Getwd()
-	log.Info("root : " + getwd)
+	mode := c.String("mode")
+	if len(strings.TrimSpace(mode)) == 0 {
+		mode = "nil"
+	}
+	log.Info("mode : " + mode)
+
+	modeYaml := c.String("dealer.mode")
+	if len(strings.TrimSpace(modeYaml)) == 0 {
+		modeYaml = "nil"
+	}
+	log.Info("mode Yaml : " + modeYaml)
+
+	logPath := c.String("log")
+	if len(strings.TrimSpace(logPath)) == 0 {
+		logPath = "nil"
+	}
+	log.Info("log : " + logPath)
+
+	logPathYaml := c.String("dealer.log")
+	if len(strings.TrimSpace(logPathYaml)) == 0 {
+		logPathYaml = "nil"
+	}
+	log.Info("log Yaml : " + logPathYaml)
+
+	root, _ := os.Getwd()
+	log.Info("root : " + root)
 	headline := c.String("headline")
 	if len(strings.TrimSpace(headline)) == 0 {
 		headline = "nil"
 	}
 	log.Info("headline : " + headline)
 
-	headlineYaml := c.String("file.extract.headline")
+	headlineYaml := c.String("dealer.file.extract.headline")
 	if len(strings.TrimSpace(headlineYaml)) == 0 {
 		headlineYaml = "nil"
 	}
@@ -157,7 +180,7 @@ func checkFlag(c *cli.Context) {
 	}
 	log.Info("target : " + target)
 
-	targetYaml := c.String("file.extract.target")
+	targetYaml := c.String("dealer.file.extract.target")
 	if len(strings.TrimSpace(targetYaml)) == 0 {
 		targetYaml = "nil"
 	}
@@ -169,7 +192,7 @@ func checkFlag(c *cli.Context) {
 	}
 	log.Info("file-format : " + fileFormat)
 
-	fileFormatYaml := c.String("file.extract.file-format")
+	fileFormatYaml := c.String("dealer.file.extract.file-format")
 	if len(strings.TrimSpace(fileFormatYaml)) == 0 {
 		fileFormatYaml = "nil"
 	}
@@ -181,7 +204,7 @@ func checkFlag(c *cli.Context) {
 	}
 	log.Info("location : " + lo)
 
-	loYaml := c.String("file.extract.location")
+	loYaml := c.String("dealer.file.extract.location")
 	if len(strings.TrimSpace(loYaml)) == 0 {
 		lo = "nil"
 	}
@@ -190,13 +213,13 @@ func checkFlag(c *cli.Context) {
 	xml := c.Bool("xml")
 	log.Info(fmt.Sprintf("xml : %v", xml))
 
-	xmlYaml := c.Bool("file.extract.xml")
+	xmlYaml := c.Bool("dealer.file.extract.xml")
 	log.Info(fmt.Sprintf("xml yaml : %v", xmlYaml))
 
 	goroutines := c.Int("goroutines")
 	log.Info(fmt.Sprintf("goroutines : %d", goroutines))
 
-	goroutinesYaml := c.Int("file.extract.goroutines")
+	goroutinesYaml := c.Int("dealer.file.extract.goroutines")
 	log.Info(fmt.Sprintf("goroutines yaml : %d", goroutinesYaml))
 
 	fileSourceDir := c.String("file-source-dir")
@@ -205,7 +228,7 @@ func checkFlag(c *cli.Context) {
 	}
 	log.Info("file-source-dir : " + fileSourceDir)
 
-	fileSourceDirYaml := c.String("file.extract.file-source-dir")
+	fileSourceDirYaml := c.String("dealer.file.extract.file-source-dir")
 	if len(strings.TrimSpace(fileSourceDirYaml)) == 0 {
 		fileFormatYaml = "nil"
 	}

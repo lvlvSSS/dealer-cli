@@ -1,11 +1,12 @@
-package schedule
+package http
 
 import (
+	"dealer-cli/schedule"
 	"github.com/urfave/cli/v2"
 	"sync"
 )
 
-func NewHttpRemote(c *cli.Context) (Remote, error) {
+func NewHttpRemote(c *cli.Context) (schedule.Remote, error) {
 	return &Http{}, nil
 }
 

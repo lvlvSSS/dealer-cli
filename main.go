@@ -12,14 +12,24 @@ import (
 	"time"
 )
 
+var checkFlag = &cli.BoolFlag{
+	Name:  "check",
+	Usage: "used to check flags' value",
+	Value: false,
+}
+
+var checkYamlFlag = altsrc.NewBoolFlag(&cli.BoolFlag{
+	Name:  "dealer.check",
+	Usage: "used to check flags' value. same as the flag 'check' ",
+})
+
 var appFlags = []cli.Flag{
 	log.ModeFlag,
+	log.ModeYamlFlag,
 	log.LogPathFlag,
-	altsrc.NewBoolFlag(&cli.BoolFlag{
-		Name:  "check",
-		Usage: "used to check flags' value",
-		Value: false,
-	}),
+	log.LogPathYamlFlag,
+	checkFlag,
+	checkYamlFlag,
 }
 
 func main() {

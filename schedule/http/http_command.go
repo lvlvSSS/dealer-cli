@@ -10,7 +10,6 @@ import (
 	"github.com/robfig/cron/v3"
 	"github.com/urfave/cli/v2"
 	"github.com/urfave/cli/v2/altsrc"
-	"regexp"
 	"strings"
 )
 
@@ -38,6 +37,7 @@ var HttpCommand = &cli.Command{
 
 		// use FileRequestProducer
 		producer := &FileRequestProducer{}
+		producer.Init(c)
 		httpClient := New()
 		httpClient.After(producer.After)
 		runner, err := checkRunner(c, producer, httpClient)
@@ -78,42 +78,8 @@ func checkFlag(c *cli.Context) {
 	log.Warn("dealer-cli schedule http - check flags begins ...")
 
 	headers := c.StringSlice("header")
-	log.Info(fmt.Sprintf("header : %v, length[%d]", headers, len(headers)))
+	log.Info(fmt.Sprintf("header : %v, length[%d], set[%v]", headers, len(headers), c.IsSet("header")))
 
 	headers = c.StringSlice("dealer.schedule.http.header")
 	log.Info(fmt.Sprintf("header yaml : %v, length[%d]", headers, len(headers)))
-}
-
-var headerFilePathRegexExpr = `"([\s\S]+?)={1}?([\s\S]+?)"`
-
-func analysisHeaderFilePath(value string) (map[string]string, error) {
-	headerFilePathRegex, err := regexp.Compile(headerFilePathRegexExpr)
-	if err != nil {
-		return nil, err
-	}
-
-	submatches := headerFilePathRegex.FindAllStringSubmatch(value, -1)
-	re := make(map[string]string, len(submatches))
-	for _, submatch := range submatches {
-		if len(submatch) != 3 {
-			return nil, errors.New(fmt.Sprintf("[%s] splitted failed by regex[%s]", value, headerFilePathRegexExpr))
-		}
-		re[submatch[1]] = submatch[2]
-	}
-	return re, nil
-}
-
-func analysisHeader(header string) (string, string, error) {
-	headerFilePathRegex, err := regexp.Compile(headerFilePathRegexExpr)
-	if err != nil {
-		return "", "", err
-	}
-	submatches := headerFilePathRegex.FindAllStringSubmatch(header, -1)
-	if len(submatches) != 1 {
-		return "", "", errors.New(fmt.Sprintf("[%s] splitted failed by regex[%s]", header, headerFilePathRegexExpr))
-	}
-	if len(submatches[0]) != 3 {
-		return "", "", errors.New(fmt.Sprintf("[%s] splitted failed by regex[%s]", header, headerFilePathRegexExpr))
-	}
-	return submatches[0][1], submatches[0][2], nil
 }

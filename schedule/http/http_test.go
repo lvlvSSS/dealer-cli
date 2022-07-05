@@ -17,12 +17,19 @@ func TestAnalysisHeaderFilePath(t *testing.T) {
 }
 
 func TestAnalysisHeader(t *testing.T) {
-	var source = `"Content-Type=text/xml; charset=utf-8"`
-	key, value, err := analysisHeader(source)
+	headers := make([]string, 0, 8)
+	headers = append(headers, `Content-Type=text/xml; charset=utf-8`)
+	headers = append(headers, `Accept-Encoding=gzip, deflate`)
+	headers = append(headers, `Content-Type=application/xml; charset=utf-8`)
+	re, err := analysisHeader(headers)
 	if err != nil {
 		t.Logf("errors : %s", err)
 		t.Fail()
 		return
 	}
-	t.Logf("analysis success : key[%s], value[%s]", key, value)
+	if len(re["Content-Type"]) != 2 {
+		t.Fail()
+		return
+	}
+	t.Logf("analysis success : result [%v]", re)
 }

@@ -41,6 +41,7 @@ func (httpClient *Http) Handle(request *HttpRequest) error {
 		return errors.New("[dealer_cli.schedule.http.Http.Handle] client not initialized ")
 	}
 	resp, err := httpClient.client.Do(request.Request)
+	defer resp.Body.Close()
 	if err != nil {
 		log.Error(fmt.Sprintf("[dealer_cli.schedule.http.Http.Handle] do request[%v], errors : %s", *request, err))
 		return err
@@ -92,7 +93,7 @@ func New() *Http {
 }
 func createTransportDialContext(dialer *net.Dialer) func(context.Context, string, string) (net.Conn, error) {
 	return func(ctx context.Context, network string, addr string) (net.Conn, error) {
-		fmt.Printf("dial context : %#v \n", ctx)
+		log.Debug(fmt.Sprintf("dial context : %#v \n", ctx))
 		return dialer.DialContext(ctx, network, addr)
 	}
 }

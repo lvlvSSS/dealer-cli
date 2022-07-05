@@ -46,13 +46,13 @@ var timesYamlFlag = altsrc.NewIntFlag(
 	},
 )
 
-var durationFlag = &cli.Int64Flag{
+var durationFlag = &cli.DurationFlag{
 	Name:  "duration",
 	Usage: "specify the duration while the cron job could do, unit is second.",
-	Value: -1,
+	Value: 0,
 }
-var durationYamlFlag = altsrc.NewInt64Flag(
-	&cli.Int64Flag{
+var durationYamlFlag = altsrc.NewDurationFlag(
+	&cli.DurationFlag{
 		Name:  "dealer.schedule.duration",
 		Usage: "specify the duration while the cron job could do, unit is second, same as the flag 'duration'",
 	},

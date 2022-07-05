@@ -3,6 +3,7 @@ package extract
 import (
 	"dealer-cli/docs"
 	LOG "dealer-cli/log"
+	file_util "dealer-cli/utils/files"
 	"dealer-cli/utils/log"
 	"fmt"
 	"github.com/pkg/errors"
@@ -10,7 +11,6 @@ import (
 	"github.com/urfave/cli/v2/altsrc"
 	"go.uber.org/zap/zapcore"
 	"os"
-	"path/filepath"
 	"strings"
 	"sync"
 )
@@ -62,7 +62,7 @@ var ExtractCommand = &cli.Command{
 		} else {
 			return errors.New("dealer_cli extract - file-source-dir is empty")
 		}
-		files, err := getAllSubFiles(fileSourceDir)
+		files, err := file_util.GetAllSubFiles(fileSourceDir)
 		if err != nil {
 			return err
 		}
@@ -97,41 +97,6 @@ var ExtractCommand = &cli.Command{
 		return err
 	},
 	Before: altsrc.InitInputSourceWithContext(extractFlags, altsrc.NewYamlSourceFromFlagFunc(docs.APP_LOAD_YAML)),
-}
-
-func getAllSubFiles(parent string) ([]string, error) {
-	parentAbs, err := filepath.Abs(parent)
-	if err != nil {
-		return nil, err
-	}
-	parent = parentAbs
-
-	result := make([]string, 0, 16)
-	stat, err := os.Stat(parent)
-	if err != nil || !stat.IsDir() {
-		if err != nil {
-			return nil, err
-		}
-		return nil, errors.New(fmt.Sprintf("extract file[%s] fails, because it is not directory ", parent))
-	}
-	files, err := os.ReadDir(parent)
-	if err != nil {
-		return nil, err
-	}
-	for _, file := range files {
-		if file.IsDir() {
-			subParent := filepath.Join(parent, file.Name())
-			subFiles, err := getAllSubFiles(subParent)
-			if err != nil {
-				continue
-			} else {
-				result = append(result, subFiles...)
-			}
-		} else {
-			result = append(result, filepath.Join(parent, file.Name()))
-		}
-	}
-	return result, nil
 }
 
 func checkFlag(c *cli.Context) {

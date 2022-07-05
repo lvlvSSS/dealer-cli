@@ -27,23 +27,26 @@ type runner struct {
 
 func (run *runner) Run() {
 	stream := run.Stream()
-
-	select {
-	case req, ok := <-stream:
-		if !ok {
-			log.Info("dealer-cli schedule http Run - stream closed ")
-			schedule_internal.DefaultCron.Stop()
+	for i := 0; i < run.repeat; i++ {
+		select {
+		case req, ok := <-stream:
+			if !ok {
+				log.Info("dealer-cli schedule http Run - stream closed ")
+				schedule_internal.DefaultCron.Stop()
+				return
+			}
+			log.Info(fmt.Sprintf("dealer-cli schedule http Run - ready to handle message[%s] ...", req.Source))
+			run.client.Handle(req)
+		default:
+			close(run.exit)
 			return
 		}
-		log.Info(fmt.Sprintf("dealer-cli schedule http Run - ready to handle message[%s] ...", req.Source))
-		run.client.Handle(req)
-	default:
-		close(run.exit)
+
+		if run.terminal != nil {
+			run.terminal <- 1
+		}
 	}
 
-	if run.terminal != nil {
-		run.terminal <- 1
-	}
 }
 
 func (run *runner) Done() {
@@ -126,10 +129,10 @@ func checkRunner(c *cli.Context, httpRequestBuilder HttpRequestBuilder, httpClie
 		return nil, errors.New("dealer_cli schedule http - times is not set")
 	}
 	// check duration
-	var duration int64 = 0
-	if duration = c.Int64("duration"); duration > 0 {
+	var duration time.Duration = 0
+	if duration = c.Duration("duration"); duration > 0 {
 		log.Debug(fmt.Sprintf("dealer_cli schedule http - duration[%d]", duration))
-	} else if duration = c.Int64("dealer.schedule.duration"); duration > 0 {
+	} else if duration = c.Duration("dealer.schedule.duration"); duration > 0 {
 		log.Debug(fmt.Sprintf("dealer_cli schedule http - dealer.schedule.duration[%d]", duration))
 	} else {
 		return nil, errors.New("dealer_cli schedule http - duration is not set")
@@ -137,8 +140,8 @@ func checkRunner(c *cli.Context, httpRequestBuilder HttpRequestBuilder, httpClie
 
 	return &runner{
 		repeat:             repeat,
-		duration:           time.Second * time.Duration(duration),
-		deadline:           time.Tick(time.Duration(duration) * time.Second),
+		duration:           duration,
+		deadline:           time.Tick(duration),
 		times:              times,
 		terminal:           make(chan int, runtime.NumCPU()*2+1),
 		client:             httpClient,

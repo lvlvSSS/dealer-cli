@@ -13,5 +13,5 @@ const APP_LOAD_YAML = "load-yaml"
 var root, _ = os.Getwd()
 var LoadFlag = &cli.StringFlag{
 	Name:  APP_LOAD_YAML,
-	Value: filepath.Join(root, "configs.yaml"),
+	Value: filepath.Join(root, "dealer.yaml"),
 }

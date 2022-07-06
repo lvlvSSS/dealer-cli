@@ -16,6 +16,14 @@ import (
 var httpFlags = []cli.Flag{
 	headerFlag,
 	headerYamlFlag,
+	methodFlag,
+	methodYamlFlag,
+	bodyFlag,
+	bodyYamlFlag,
+	urlFlag,
+	urlYamlFlag,
+	doneLocationFlag,
+	doneLocationYamlFlag,
 }
 var HttpCommand = &cli.Command{
 	Name:  "http",
@@ -30,7 +38,7 @@ var HttpCommand = &cli.Command{
 			checkFlag(c)
 			return nil
 		}
-		cronSchedule, err := checkCron(c)
+		cronSchedules, err := checkCron(c)
 		if err != nil {
 			return err
 		}
@@ -38,13 +46,16 @@ var HttpCommand = &cli.Command{
 		// use FileRequestProducer
 		producer := &FileRequestProducer{}
 		producer.Init(c)
+
 		httpClient := New()
 		httpClient.After(producer.After)
 		runner, err := checkRunner(c, producer, httpClient)
 		if err != nil {
 			return err
 		}
-		schedule_internal.DefaultCron.Schedule(cronSchedule, runner)
+		for _, cronSchedule := range cronSchedules {
+			schedule_internal.DefaultCron.Schedule(cronSchedule, runner)
+		}
 		schedule_internal.DefaultCron.Start()
 		runner.Done()
 		return nil
@@ -57,29 +68,101 @@ var HttpCommand = &cli.Command{
 }
 
 // check the cron is valid or not
-func checkCron(c *cli.Context) (cron.Schedule, error) {
-	cronExpr := ""
-	if cronExpr = c.String("cron"); len(strings.TrimSpace(cronExpr)) != 0 {
-		log.Debug(fmt.Sprintf("dealer_cli schedule http - cron[%s]", cronExpr))
-	} else if cronExpr = c.String("dealer.schedule.cron"); len(strings.TrimSpace(cronExpr)) != 0 {
-		log.Debug(fmt.Sprintf("dealer_cli schedule http - dealer.schedule.cron[%s]", cronExpr))
+func checkCron(c *cli.Context) ([]cron.Schedule, error) {
+	cronExprs := make([]string, 0, 8)
+	if cronExprs = c.StringSlice("cron"); len(cronExprs) != 0 {
+		log.Debug(fmt.Sprintf("dealer_cli schedule http - cron[%v]", cronExprs))
+	} else if cronExprs = c.StringSlice("dealer.schedule.cron"); len(cronExprs) != 0 {
+		log.Debug(fmt.Sprintf("dealer_cli schedule http - dealer.schedule.cron[%v]", cronExprs))
 	} else {
 		return nil, errors.New("dealer_cli schedule http - cron is empty")
 	}
-	cron, err := cron.ParseStandard(cronExpr)
-	if err != nil {
-		log.Error(fmt.Sprintf("dealer_cli schedule http - cron[%s] is invalid", cronExpr))
-		return nil, err
+	crons := make([]cron.Schedule, 0, len(cronExprs))
+	for _, cronExpr := range cronExprs {
+		cron, err := schedule_internal.DefaultParser.Parse(cronExpr)
+		if err != nil {
+			log.Error(fmt.Sprintf("dealer_cli schedule http - cron[%s] is invalid", cronExprs))
+			return nil, err
+		}
+		crons = append(crons, cron)
 	}
-	return cron, nil
+	return crons, nil
 }
 
 func checkFlag(c *cli.Context) {
 	log.Warn("dealer-cli schedule http - check flags begins ...")
+
+	cronExpr := c.StringSlice("cron")
+
+	log.Info(fmt.Sprintf("cron : %v", cronExpr))
+
+	cronExpr = c.StringSlice("dealer.schedule.cron")
+	log.Info(fmt.Sprintf("cron yaml : %v", cronExpr))
+
+	repeat := c.Int("repeat")
+	log.Info(fmt.Sprintf("repeat : %v", repeat))
+
+	repeat = c.Int("dealer.schedule.repeat")
+	log.Info(fmt.Sprintf("repeat yaml : %v", repeat))
+
+	times := c.Int("times")
+	log.Info(fmt.Sprintf("times : %v", times))
+	times = c.Int("dealer.schedule.times")
+	log.Info(fmt.Sprintf("times yaml : %v", times))
+
+	duration := c.Duration("duration")
+	log.Info(fmt.Sprintf("duration : %v", duration))
+	duration = c.Duration("dealer.schedule.duration")
+	log.Info(fmt.Sprintf("duration yaml : %v", duration))
 
 	headers := c.StringSlice("header")
 	log.Info(fmt.Sprintf("header : %v, length[%d], set[%v]", headers, len(headers), c.IsSet("header")))
 
 	headers = c.StringSlice("dealer.schedule.http.header")
 	log.Info(fmt.Sprintf("header yaml : %v, length[%d]", headers, len(headers)))
+
+	method := c.String("method")
+	if len(strings.TrimSpace(method)) == 0 {
+		method = "nil"
+	}
+	log.Info(fmt.Sprintf("method : %v", method))
+	method = c.String("dealer.schedule.http.method")
+	if len(strings.TrimSpace(method)) == 0 {
+		method = "nil"
+	}
+	log.Info(fmt.Sprintf("method yaml : %v", method))
+
+	body := c.String("body")
+	if len(strings.TrimSpace(body)) == 0 {
+		body = "nil"
+	}
+	log.Info(fmt.Sprintf("body : %v", body))
+	body = c.String("dealer.schedule.http.body")
+	if len(strings.TrimSpace(body)) == 0 {
+		body = "nil"
+	}
+	log.Info(fmt.Sprintf("body yaml : %v", body))
+
+	url := c.String("url")
+	if len(strings.TrimSpace(url)) == 0 {
+		url = "nil"
+	}
+	log.Info(fmt.Sprintf("url : %v", url))
+	url = c.String("dealer.schedule.http.url")
+	if len(strings.TrimSpace(url)) == 0 {
+		url = "nil"
+	}
+	log.Info(fmt.Sprintf("url yaml : %v", url))
+
+	doneLocation := c.String("done-location")
+	if len(strings.TrimSpace(doneLocation)) == 0 {
+		doneLocation = "nil"
+	}
+	log.Info(fmt.Sprintf("done-location : %v", doneLocation))
+
+	doneLocation = c.String("dealer.schedule.http.done-location")
+	if len(strings.TrimSpace(doneLocation)) == 0 {
+		doneLocation = "nil"
+	}
+	log.Info(fmt.Sprintf("done-location yaml : %v", doneLocation))
 }

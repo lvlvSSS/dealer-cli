@@ -26,6 +26,7 @@ type runner struct {
 }
 
 func (run *runner) Run() {
+	log.Debug(fmt.Sprintf("runner : %p", run))
 	stream := run.Stream()
 	for i := 0; i < run.repeat; i++ {
 		select {
@@ -33,6 +34,7 @@ func (run *runner) Run() {
 			if !ok {
 				log.Info("dealer-cli schedule http Run - stream closed ")
 				schedule_internal.DefaultCron.Stop()
+				close(run.exit)
 				return
 			}
 			log.Info(fmt.Sprintf("dealer-cli schedule http Run - ready to handle message[%s] ...", req.Source))
@@ -52,23 +54,25 @@ func (run *runner) Run() {
 func (run *runner) Done() {
 	defer schedule_internal.DefaultCron.Stop()
 	if run.deadline != nil && run.terminal != nil {
-		select {
-		case <-run.deadline:
-			log.Info(fmt.Sprintf("dealer-cli schedule http - reach the deadline[%s]", run.duration))
-			break
-		case _, ok := <-run.terminal:
-			if !ok {
-				log.Info("dealer-cli schedule http - term closed")
+		for {
+			select {
+			case <-run.deadline:
+				log.Info(fmt.Sprintf("dealer-cli schedule http - reach the deadline[%s]", run.duration))
+				return
+			case _, ok := <-run.terminal:
+				if !ok {
+					log.Info("dealer-cli schedule http - term closed")
+					return
+				}
+				run.times--
+				if run.times <= 0 {
+					log.Info(fmt.Sprintf("dealer-cli schedule http - reach the term[%d]", run.times))
+					return
+				}
+			case <-run.exit:
+				log.Info("dealer-cli schedule http - exit ...")
 				return
 			}
-			run.times--
-			if run.times <= 0 {
-				log.Info(fmt.Sprintf("dealer-cli schedule http - reach the term[%d]", run.times))
-				break
-			}
-		case <-run.exit:
-			log.Info("dealer-cli schedule http - exit ...")
-			return
 		}
 	} else if run.deadline != nil {
 		select {
@@ -80,20 +84,22 @@ func (run *runner) Done() {
 			return
 		}
 	} else if run.terminal != nil {
-		select {
-		case _, ok := <-run.terminal:
-			if !ok {
-				log.Info("dealer-cli schedule http - term closed")
+		for {
+			select {
+			case _, ok := <-run.terminal:
+				if !ok {
+					log.Info("dealer-cli schedule http - term closed")
+					return
+				}
+				run.times--
+				if run.times <= 0 {
+					log.Info(fmt.Sprintf("dealer-cli schedule http - reach the term[%d]", run.times))
+					return
+				}
+			case <-run.exit:
+				log.Info("dealer-cli schedule http - exit ...")
 				return
 			}
-			run.times--
-			if run.times <= 0 {
-				log.Info(fmt.Sprintf("dealer-cli schedule http - reach the term[%d]", run.times))
-				break
-			}
-		case <-run.exit:
-			log.Info("dealer-cli schedule http - exit ...")
-			return
 		}
 	} else {
 		select {

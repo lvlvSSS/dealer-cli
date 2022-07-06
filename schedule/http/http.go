@@ -22,7 +22,7 @@ func (httpClient *Http) Before(beforeFunc func(request *HttpRequest) error) {
 	httpClient.mutex.Lock()
 	defer httpClient.mutex.Unlock()
 	if httpClient.before == nil {
-		httpClient.before = make([]func(request *HttpRequest) error, 16)
+		httpClient.before = make([]func(request *HttpRequest) error, 0, 16)
 	}
 	httpClient.before = append(httpClient.before, beforeFunc)
 }
@@ -66,7 +66,7 @@ func (httpClient *Http) After(afterFunc func(response *HttpResponse) error) {
 	httpClient.mutex.Lock()
 	defer httpClient.mutex.Unlock()
 	if httpClient.after == nil {
-		httpClient.after = make([]func(response *HttpResponse) error, 16)
+		httpClient.after = make([]func(response *HttpResponse) error, 0, 16)
 	}
 	httpClient.after = append(httpClient.after, afterFunc)
 }

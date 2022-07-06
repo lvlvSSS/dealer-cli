@@ -2,6 +2,19 @@ dealer:
   mode: 'info'
   log: '.\Logs\dealer-cli.log'
   ## check: true
+  schedule:
+    cron:
+      - '0/1 * * * * ?'
+    repeat: 1
+    times: 10
+    duration: '1h'
+    http:
+      header:
+        - 'Content-Type=text/xml; charset=utf-8'
+        - 'Accept-Encoding=gzip, deflate, br'
+      method: 'POST'
+      url: 'www.bing.com'
+      done-location: './target/done'
   file:
     extract:
       xml: true

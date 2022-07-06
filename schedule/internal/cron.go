@@ -8,7 +8,8 @@ import (
 	"time"
 )
 
-var DefaultCron = cron.New(cron.WithLogger(&cronLogger{}), cron.WithChain(cron.Recover(&cronLogger{})))
+var DefaultParser = cron.NewParser(cron.Second | cron.Minute | cron.Hour | cron.Dom | cron.Month | cron.Dow | cron.Descriptor)
+var DefaultCron = cron.New(cron.WithLogger(&cronLogger{}), cron.WithChain(cron.Recover(&cronLogger{})), cron.WithParser(DefaultParser))
 
 type cronLogger struct{}
 

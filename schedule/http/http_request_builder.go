@@ -8,6 +8,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/urfave/cli/v2"
 	"github.com/urfave/cli/v2/altsrc"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -71,13 +72,14 @@ func (producer *FileRequestProducer) Init(c *cli.Context) error {
 		return errors.New("[dealer_cli.schedule.http.FileRequestProducer.Init] url is empty")
 	}
 	// set method
-	if producer.method = strings.ToUpper(c.String("method")); len(strings.TrimSpace(producer.method)) != 0 {
+	if c.IsSet("method") {
+		producer.method = strings.ToUpper(c.String("method"))
 		log.Debug(fmt.Sprintf("[dealer_cli.schedule.http.FileRequestProducer.Init] method[%s]", producer.method))
 	} else if producer.method = strings.ToUpper(c.String("dealer.schedule.http.method")); len(strings.TrimSpace(producer.method)) != 0 {
 		log.Debug(fmt.Sprintf("[dealer_cli.schedule.http.FileRequestProducer.Init] dealer.schedule.http.method[%s]", producer.method))
 	} else {
-		log.Error("[dealer_cli.schedule.http.FileRequestProducer.Init] method is empty")
-		return errors.New("[dealer_cli.schedule.http.FileRequestProducer.Init] method is empty")
+		producer.method = strings.ToUpper(c.String("method"))
+		log.Debug(fmt.Sprintf("[dealer_cli.schedule.http.FileRequestProducer.Init] method forced to [%s]", producer.method))
 	}
 	// set headers
 	if headerSource := c.StringSlice("dealer.schedule.http.header"); len(headerSource) > 0 {
@@ -156,7 +158,7 @@ func (producer *FileRequestProducer) compileBody(regexExpr string) error {
 		return err
 	}
 	producer.fileFormat = fullPath
-	producer.fileSourceDir = filepath.Clean(strings.TrimRight(fullPath, producer.fileFormat))
+	producer.fileSourceDir = filepath.Clean(strings.TrimRight(fullPath, filepath.Base(producer.fileFormat)))
 	fileSourceStat, err := os.Stat(producer.fileSourceDir)
 	if err != nil || !fileSourceStat.IsDir() {
 		return errors.New(fmt.Sprintf("[dealer_cli.schedule.http.FileRequestProducer.compileBody] compile failed : fileSourceDir[%s] is not directory", producer.fileSourceDir))
@@ -172,7 +174,10 @@ func (producer *FileRequestProducer) Stream() <-chan *HttpRequest {
 	if producer.requests != nil {
 		return producer.requests
 	}
+
 	requests := make(chan *HttpRequest, runtime.NumCPU()*2+1)
+	producer.requests = requests
+
 	files, _ := file_util.GetAllSubFiles(producer.fileSourceDir)
 	if len(files) <= (runtime.NumCPU()*2 + 1) {
 		for _, file := range files {
@@ -230,6 +235,14 @@ func (producer *FileRequestProducer) isValid(file string) *HttpRequest {
 		log.Error(fmt.Sprintf("[dealer_cli.schedule.http.FileRequestProducer.isValid] create request failed[%s] errors : %v", file, err))
 		return nil
 	}
+	// set headers
+	if producer.headers != nil {
+		for key, values := range producer.headers {
+			for _, value := range values {
+				req.Header.Add(key, value)
+			}
+		}
+	}
 
 	return &HttpRequest{
 		Request: req,
@@ -238,6 +251,14 @@ func (producer *FileRequestProducer) isValid(file string) *HttpRequest {
 }
 
 func (producer *FileRequestProducer) After(response *HttpResponse) error {
+	all, err := ioutil.ReadAll(response.Response.Body)
+	if err == nil {
+		log.Info(
+			fmt.Sprintf("[dealer_cli.schedule.http.FileRequestProducer.After] request from file[%s], response is [%s]",
+				response.Source,
+				converter.BytesToString(all)))
+	}
+
 	if response.StatusCode != 200 {
 		log.Warn(fmt.Sprintf("[dealer_cli.schedule.http.FileRequestProducer.After] send file[%s] failed.", response.Source))
 		return nil

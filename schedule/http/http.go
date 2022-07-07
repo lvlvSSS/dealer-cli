@@ -41,7 +41,13 @@ func (httpClient *Http) Handle(request *HttpRequest) error {
 		return errors.New("[dealer_cli.schedule.http.Http.Handle] client not initialized ")
 	}
 	resp, err := httpClient.client.Do(request.Request)
-	defer resp.Body.Close()
+	defer func() {
+		if resp != nil && resp.Body != nil {
+			resp.Body.Close()
+		} else {
+			log.Error(fmt.Sprintf("[dealer_cli.schedule.http.Http.Handle] no body returns: [%s]", resp.Status))
+		}
+	}()
 	if err != nil {
 		log.Error(fmt.Sprintf("[dealer_cli.schedule.http.Http.Handle] do request[%v], errors : %s", *request, err))
 		return err

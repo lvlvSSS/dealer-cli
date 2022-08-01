@@ -2,6 +2,7 @@ package extract
 
 import (
 	"bufio"
+	file_util "dealer-cli/utils/files"
 	"fmt"
 	"io/fs"
 	"os"
@@ -69,7 +70,7 @@ func TestGetAllSubFiles(t *testing.T) {
 	current, _ := os.Getwd()
 	t.Logf("current path : %s \n", current)
 	join := filepath.Join(current, "\\", "..")
-	files, _ := getAllSubFiles(join)
+	files, _ := file_util.GetAllSubFiles(join)
 	fmt.Printf("All sub files : %v", files)
 	if len(files) != 7 {
 		t.Fail()
